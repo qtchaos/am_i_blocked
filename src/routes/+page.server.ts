@@ -11,8 +11,19 @@ export const actions = {
 			return fail(400, { invalid: true });
 		}
 
+		const headers = new Headers();
+		const headerKeys = data.getAll('header-key');
+		const headerValues = data.getAll('header-value');
+
+		for (let i = 0; i < headerKeys.length; i++) {
+			headers.set(headerKeys[i] as string, headerValues[i] as string);
+		}
+
 		const startTime = Date.now();
-		const response = await fetch(url);
+		const response = await fetch(url, {
+			headers
+		});
+
 		const endTime = Date.now();
 
 		const returnable = {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import HeaderPicker from './../components/HeaderPicker.svelte';
 	import { enhance } from '$app/forms';
 	import { writable } from 'svelte/store';
 	import type { PageProps } from './$types';
@@ -7,6 +8,7 @@
 	let { form }: PageProps = $props();
 
 	const showModal = writable(false);
+	const headerPickers = writable(1);
 
 	function titleCaseHeader(header: string) {
 		return header
@@ -86,20 +88,44 @@
 <main class="flex flex-col items-center justify-center h-screen">
 	<div class="w-96 mb-96">
 		<CloudflareLogo />
-		<form method="POST" use:enhance class="w-full">
-			<input
-				type="url"
-				name="url"
-				minlength="5"
-				maxlength="256"
-				required
-				class="bordered py-2 px-2.5 rounded-l-md border-r-0 border rounded-r-none text-sm outline-blue-600 focus:outline-2 outline-offset-2 w-full"
-				placeholder="Request a site from Cloudflare servers"
-			/>
-			<button
-				class="rounded-r-md px-3 border border-blue-600 text-blue-600 text-sm hover:bg-[#dcebff] transition-colors"
-				type="submit">Submit</button
-			>
+		<form method="POST" use:enhance class="w-full flex flex-col">
+			<div class="w-full flex flex-row items-stretch">
+				<input
+					type="url"
+					name="url"
+					minlength="5"
+					maxlength="256"
+					required
+					class="bordered py-2 px-2.5 bg-white rounded-l-md border-r-0 border rounded-r-none text-sm outline-blue-600 focus:outline-2 outline-offset-2 w-full"
+					placeholder="Request a site from Cloudflare servers"
+				/>
+				<button
+					class="rounded-r-md px-3 border border-blue-600 text-blue-600 text-sm bg-white hover:bg-[#dcebff] transition-colors"
+					type="submit">Submit</button
+				>
+			</div>
+			<div class="flex flex-col mt-2 gap-y-2">
+				<div
+					class="flex flex-col w-full gap-y-2 max-h-10 overflow-y-scroll snap-y"
+					id="header-pickers"
+				>
+					{#each Array.from({ length: $headerPickers }, (_, i) => i)}
+						<HeaderPicker />
+					{/each}
+				</div>
+				<div class="flex flex-row gap-x-2">
+					<button
+						class="border border-blue-600 text-blue-600 text-sm bg-white hover:bg-[#dcebff] rounded-md py-2.5 transition-colors w-1/2"
+						type="button"
+						onclick={() => headerPickers.update((e) => e + 1)}>Add Header</button
+					>
+					<button
+						class="border border-red-600 text-red-600 text-sm bg-white hover:bg-[#ffdcdc] rounded-md py-2.5 transition-colors w-1/2"
+						type="button"
+						onclick={() => headerPickers.update((e) => Math.max(e - 1, 1))}>Remove Header</button
+					>
+				</div>
+			</div>
 		</form>
 		{#if form}
 			<div class="text-sm mt-2 flex flex-row items-stretch justify-between w-full">
@@ -163,5 +189,11 @@
 
 	iframe {
 		border: none;
+	}
+
+	#header-pickers {
+		/* scroll */
+		scrollbar-width: thin;
+		scrollbar-color: #e9e9e9 #ffffff;
 	}
 </style>
